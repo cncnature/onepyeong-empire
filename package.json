@@ -1,0 +1,22 @@
+{
+  "name": "onepyeong-empire",
+  "version": "1.0.0",
+  "private": true,
+  "description": "일평제국 - 구석기 1평에서 근대 제국까지",
+  "scripts": {
+    "fonts": "node scripts/copy-fonts.js",
+    "sync": "node scripts/copy-fonts.js && cap sync android",
+    "build:apk": "npm run sync && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3",
+    "@fontsource/black-han-sans": "5.3.0",
+    "@fontsource/jua": "5.3.0",
+    "@fontsource/lilita-one": "5.3.0"
+  }
+}

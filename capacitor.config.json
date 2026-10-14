@@ -1,0 +1,9 @@
+{
+  "appId": "com.medihealthtech.onepyeong",
+  "appName": "일평제국",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#2f9fd8",
+    "allowMixedContent": false
+  }
+}
