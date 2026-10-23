@@ -7,6 +7,12 @@ HTML5 게임(`www/index.html`)을 Capacitor로 감싼 구조이며, 가로 화�
 - 최소 안드로이드 7.0 (API 24) 이상
 - 저장: 폰 안에 자동 저장 (10초마다, 앱을 내릴 때도 저장)
 
+## 바로 플레이 (웹)
+
+https://cncnature.github.io/onepyeong-empire/
+
+PC·안드로이드·아이폰 브라우저에서 바로 실행됩니다. `www/` 를 수정해 올리면 자동으로 다시 배포됩니다.
+
 ## 방법 1 — GitHub가 APK를 자동으로 만들어 주기 (PC 설치 불필요)
 
 1. https://github.com 에 로그인 → 오른쪽 위 **+** → **New repository**
