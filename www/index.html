@@ -586,7 +586,7 @@ const BANNERS=[
 const QUESTS=[
  {n:"첫 1평 분양",d:"마을 옆 금색 점선 땅을 눌러 분양받으세요.",ok:()=>owned()>=2,r:{food:30,wood:30}},
  {n:"첫 생산 시설",d:"분양받은 땅을 눌러 시설을 지으세요.",ok:()=>S.tiles.some(t=>t.t!=="town"&&t.b>=1),r:{food:40,wood:40}},
- {n:"첫 뽑기",d:"뽑기 탭에서 무료 뽑기권 1,000장으로 영웅을 소환하세요.",ok:()=>S.g.total>=1,r:{food:40,wood:40}},
+ {n:"첫 뽑기",d:"뽑기 탭에서 배너별 무료 뽑기권 100장으로 영웅을 소환하세요.",ok:()=>S.g.total>=1,r:{food:40,wood:40}},
  {n:"전사 훈련",d:"군영 탭에서 전사를 훈련하세요.",ok:()=>S.stats.trained>=1||S.units.some(Boolean),r:{food:40}},
  {n:"출격 부대 편성",d:"전사를 눌러 선택한 뒤 출격 슬롯을 누르세요. '최강 편성' 버튼도 있습니다.",ok:()=>S.slots.some(Boolean),r:{wood:40,stone:20}},
  {n:"첫 밤을 버텨라",d:"마우스로 부대를 움직여 습격자를 쏘고, 파란 관문을 통과하세요.",ok:()=>S.stats.wins>=1,r:{food:60,coin:20}},
@@ -623,7 +623,7 @@ function genTiles(seed){
   tiles[(cy+1)*W+cx-1].t="river";tiles[(cy+2)*W+cx-1].t="river";tiles[(cy-1)*W+cx+1].t="forest";
   return tiles;
 }
-function newGacha(){return {tix:{all:1000,pickup:0,hero:0,unit:0,relic:0,res:0},pity:{},heroes:{},relics:{},leader:null,total:0,best:-1,lastDaily:0}}
+function newGacha(){return {tix:{all:0,pickup:100,hero:100,unit:100,relic:100,res:100},pity:{},heroes:{},relics:{},leader:null,total:0,best:-1,lastDaily:0}}
 function newState(){
   const seed=Math.floor(Math.random()*1e9);
   return {v:2,seed,started:false,job:null,era:0,th:1,res:{food:60,wood:60,stone:20,metal:0,coin:10},
@@ -1349,7 +1349,7 @@ addEventListener("beforeunload",()=>{if(S&&S.started)save()});
 
 /* ---------- start ---------- */
 function intro(){modal(`<h1>일평제국</h1><p>돌칼 하나로 시작해 근대 제국까지. 부족의 족장이 되어 첫 1평을 분양받고, 낮에는 땅을 일구고 밤에는 몰려오는 습격자를 부대 사격으로 막아내세요. 영웅을 모아 원정을 떠나고, 아홉 시대를 지나 미러 경제를 완성하세요.</p>
-  <div class="card" style="border-color:#ffc94a;background:#fff8df"><b class="gSSS" style="font-size:20px">개척 기념 선물 · 뽑기권 1,000장</b><span class="small">시작하자마자 영웅 소환에서 쓸 수 있습니다.</span></div>
+  <div class="card" style="border-color:#ffc94a;background:#fff8df"><b class="gSSS" style="font-size:20px">개척 기념 선물 · 배너별 뽑기권 100장씩</b><span class="small">시대 픽업 · 영웅 소환 · 전사 징집 · 유물 발굴 · 보급 상자 각 100장 (총 500장)</span></div>
   <h3>첫 직업을 고르세요</h3><div class="choices">${Object.entries(JOBS).map(([k,j])=>`<button class="choice" data-j="${k}"><span class="bigi">${j.ic}</span><b>${j.n}</b><span class="small">${j.d}</span></button>`).join("")}</div>`);
   $("modalBox").querySelectorAll("[data-j]").forEach(b=>b.onclick=()=>{S.job=b.dataset.j;S.started=true;S.g.lastDaily=Date.now();EFFC={};mcKey="";closeModal();SFX.win();flash("rgba(255,250,220,.8)",700);toast("마을 옆 + 표시 땅을 눌러 첫 1평을 분양받으세요");refresh();save()})}
 function offline(){const el=Math.min(8*3600,(Date.now()-(S.last||Date.now()))/1000);let html="";
