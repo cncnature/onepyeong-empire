@@ -2295,8 +2295,9 @@ function fDown(){const z=FZ;if(!z)return;const e=EV();
   if(z.st==="reel")z.hold=true}
 function fUp(){const z=FZ;if(!z)return;if(z.st==="idle"&&z.charge){z.charge=false;castLine()}if(z.st==="reel")z.hold=false}
 function castLine(){const z=FZ,e=EV();e.bait[e.bsel]--;z.dist=Math.max(.08,z.pow);z.st="fly";z.fly=0;z.from={...z.tip};z.to=bobPos(z.dist);snd(520,.22,"sine",.05,180);fishHud()}
+const zw0=R=>Math.min(.9,R.z*1.6);
 function startReel(){const z=FZ,e=EV(),c=rollFish(z.dist),g=c.f.g;z.st="reel";z.hold=false;
-  z.reel={c,fy:.5,ft:.5,fv:0,zy:.35,zv:0,prog:.3,nt:0,spd:.32+g*.2,erratic:.15+g*.12,jt:0};fMsg("챔질 성공! 초록 칸 안에 물고기를 가두세요","#d8ffb0");snd(880,.08,"square",.05);SFX.gate()}
+  z.reel={c,fy:.5,ft:.5,fv:0,zy:.5,zv:0,prog:.45,nt:0,spd:.2+g*.11,erratic:.06+g*.06,jt:0};fMsg("챔질 성공! 초록 칸 안에 물고기를 가두세요","#d8ffb0");snd(880,.08,"square",.05);SFX.gate()}
 function rollFish(dist){const e=EV(),R=RODS[e.rod],luck=R.luck+BAITS[e.bsel].luck+dist*.3;const w=[52,26,13,6,2.2,.7].map((x,g)=>x*Math.pow(1+luck,g*.95));
   let r=Math.random()*w.reduce((a,b)=>a+b),g=0;for(;g<5;g++){r-=w[g];if(r<0)break}
   const pool=gg=>FISH.filter(f=>f.g===gg&&f.sp.includes(e.spot)&&(!f.junk||Math.random()<.5));let p=pool(g);while(g>0&&!p.length){g--;p=pool(g)}if(!p.length)p=FISH.filter(f=>f.g===0&&f.sp.includes(e.spot));
@@ -2309,12 +2310,12 @@ function fishUpdate(dt){const z=FZ,e=EV(),R=RODS[e.rod];z.msgT-=dt;z.dip=Math.ma
   if(z.st==="fly"){z.fly+=dt/.65;const k=Math.min(1,z.fly);z.bob={x:z.from.x+(z.to.x-z.from.x)*k,y:z.from.y+(z.to.y-z.from.y)*k-Math.sin(k*Math.PI)*160,s:z.to.s};
     if(k>=1){z.st="wait";z.bob={...z.to};z.waitT=(1.3+Math.random()*3.2)*BAITS[e.bsel].bite;z.nib=.6+Math.random();splash(z.bob.x,z.bob.y,10);snd(300,.1,"sine",.04,120)}}
   else if(z.st==="wait"){z.waitT-=dt;z.nib-=dt;if(z.nib<=0){z.nib=.5+Math.random()*1.2;z.dip=.35;z.rip.push({x:z.bob.x,y:z.bob.y,r:4,life:.8})}
-    if(z.waitT<=0){z.st="bite";z.biteT=R.win;z.dip=1;splash(z.bob.x,z.bob.y,16);snd(980,.12,"square",.06);fMsg("! 지금 누르세요 !","#ffe36a")}}
+    if(z.waitT<=0){z.st="bite";z.biteT=R.win*1.6;z.dip=1;splash(z.bob.x,z.bob.y,16);snd(980,.12,"square",.06);fMsg("! 지금 누르세요 !","#ffe36a")}}
   else if(z.st==="bite"){z.biteT-=dt;z.dip=1;if(z.biteT<=0){z.st="idle";z.bob=null;fMsg("놓쳤다… 물고기가 미끼만 따먹고 갔다","#ffb0a0");SFX.bad()}}
-  else if(z.st==="reel"){const r=z.reel,g=r.c.f.g;r.nt-=dt;if(r.nt<=0){r.nt=(.35+Math.random()*1.1)/(1+g*.25);r.ft=Math.random()<r.erratic?(Math.random()<.5?.05:.95):.1+Math.random()*.8}
+  else if(z.st==="reel"){const r=z.reel,g=r.c.f.g;r.nt-=dt;if(r.nt<=0){r.nt=(.7+Math.random()*1.4)/(1+g*.15);r.ft=Math.random()<r.erratic?(Math.random()<.5?.05:.95):.1+Math.random()*.8}
     r.fv+=((r.ft-r.fy)*r.spd*9-r.fv*3)*dt;r.fy=Math.max(0,Math.min(1,r.fy+r.fv*dt));
-    r.zv+=(z.hold?2.3:-1.9)*dt;r.zy+=r.zv*dt;if(r.zy<R.z/2){r.zy=R.z/2;r.zv=Math.abs(r.zv)*.3}if(r.zy>1-R.z/2){r.zy=1-R.z/2;r.zv=-Math.abs(r.zv)*.3}
-    const inside=Math.abs(r.fy-r.zy)<R.z/2;r.in=inside;r.prog+=inside?R.pw*dt*(1-g*.05):-.2*dt*(1+g*.12);r.jt-=dt;
+    r.zv+=(z.hold?1.6:-1.3)*dt;r.zv*=Math.pow(.25,dt);r.zy+=r.zv*dt;if(r.zy<zw0(R)/2){r.zy=zw0(R)/2;r.zv=Math.abs(r.zv)*.3}if(r.zy>1-zw0(R)/2){r.zy=1-zw0(R)/2;r.zv=-Math.abs(r.zv)*.3}
+    const zw=Math.min(.9,R.z*1.6);const inside=Math.abs(r.fy-r.zy)<zw/2;r.in=inside;r.prog+=inside?R.pw*1.6*dt*(1-g*.04):-.1*dt*(1+g*.08);r.jt-=dt;
     if(r.jt<=0){r.jt=.12;if(inside)snd(500+r.prog*500,.03,"triangle",.02);z.bob.x+=(Math.random()-.5)*14;z.bob.x=Math.max(FZ.W*.3,Math.min(FZ.W*.85,z.bob.x));splash(z.bob.x,z.bob.y,inside?2:4)}
     if(r.prog>=1){z.st="show";fishCaught(r.c)}else if(r.prog<=0){z.st="idle";z.bob=null;fMsg("줄이 풀렸다! 물고기가 도망갔다","#ffb0a0");SFX.lose()}}}
 function splash(x,y,n){for(let i=0;i<n;i++)FZ.p.push({x,y,vx:(Math.random()-.5)*160,vy:-120-Math.random()*200,life:.5+Math.random()*.4,r:2+Math.random()*3});FZ.rip.push({x,y,r:6,life:1})}
@@ -2359,7 +2360,7 @@ function fishDraw(){const z=FZ,c=z.c,W=z.W,t=z.t,e=EV(),sp=SPOTS[e.spot],HZ6=210
 function drawReel(c,W,t){const z=FZ,r=z.reel,R=RODS[EV().rod],x=W-230,y=80,h=360,w=56;
   c.fillStyle="rgba(10,20,40,.78)";rr(c,x-14,y-14,w+70,h+28,16);c.fill();c.strokeStyle="rgba(255,255,255,.35)";c.lineWidth=2;c.stroke();
   let g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,"#3a9ad8");g.addColorStop(1,"#0a3a6a");c.fillStyle=g;rr(c,x,y,w,h,10);c.fill();
-  const zh=R.z*h,zy=y+h-(r.zy*h)-zh/2;c.fillStyle=r.in?"rgba(120,255,140,.55)":"rgba(120,255,140,.3)";rr(c,x+3,zy,w-6,zh,8);c.fill();c.strokeStyle=r.in?"#d8ffb0":"#7dff9a";c.lineWidth=3;c.stroke();
+  const zh=zw0(R)*h,zy=y+h-(r.zy*h)-zh/2;c.fillStyle=r.in?"rgba(120,255,140,.55)":"rgba(120,255,140,.3)";rr(c,x+3,zy,w-6,zh,8);c.fill();c.strokeStyle=r.in?"#d8ffb0":"#7dff9a";c.lineWidth=3;c.stroke();
   const fy=y+h-r.fy*h,f=r.c.f;c.save();c.translate(x+w/2,fy);c.rotate(Math.sin(t*12)*.25);c.font="34px "+EMOJI;c.textAlign="center";c.textBaseline="middle";if(f.h)c.filter=`hue-rotate(${f.h}deg)`;c.fillText(f.junk?"❔":f.ic,0,0);c.restore();c.filter="none";
   const px=x+w+14;c.fillStyle="#0e1822";rr(c,px,y,18,h,8);c.fill();const ph=Math.max(0,Math.min(1,r.prog))*h;g=c.createLinearGradient(0,y+h,0,y);g.addColorStop(0,"#ff8a3a");g.addColorStop(.5,"#ffe36a");g.addColorStop(1,"#7dff9a");c.fillStyle=g;rr(c,px,y+h-ph,18,ph,8);c.fill();
   olText2(c,"???",x+w/2+12,y-28,18,"#fff")}
@@ -2379,7 +2380,7 @@ function fishCaught(c){const e=EV(),f=c.f,g=f.g,m=1+S.era,out=[],rw={};S.stats.f
    <div class="fi" style="${f.h?`filter:hue-rotate(${f.h}deg) drop-shadow(0 6px 0 rgba(0,0,0,.3))`:""}">${f.ic}</div><h2 class="ol">${f.n}</h2><div class="wt">${f.junk?"":c.wt>=1000?(c.wt/1000).toFixed(2)+" 톤":c.wt.toFixed(2)+" kg"}</div>
    <div class="rw">${rewardHTML(rw)}${out.map(x=>`<div class="pill y">${x}</div>`).join("")}<div class="pill">🏆 대회 +${pts}점</div></div><button class="btn big2" id="fGo">계속 낚시</button></div>`;
   $("fGo").onclick=()=>{R.hidden=true;FZ.st="idle";FZ.bob=null;fishHud();save()};save();fishHud()}
-function fishShop(){const e=EV();const rods=RODS.map((r,i)=>{const own=e.rod>=i,next=i===e.rod+1,lock=S.era<r.era,c=rodCost(i);return `<div class="card row between"><span>${r.ic} <b>${r.n}</b> <small>칸 ${Math.round(r.z*100)}% · 행운 +${Math.round(r.luck*100)}%</small></span>${own?'<span class="pill g">보유</span>':lock?`<span class="pill">${ERAS[r.era].n} 필요</span>`:next?costHTML(c)+`<button class="btn" data-rod="${i}" ${canPay(c)?"":"disabled"}>제작</button>`:'<span class="pill">이전 단계 필요</span>'}</div>`}).join("");
+function fishShop(){const e=EV();const rods=RODS.map((r,i)=>{const own=e.rod>=i,next=i===e.rod+1,lock=S.era<r.era,c=rodCost(i);return `<div class="card row between"><span>${r.ic} <b>${r.n}</b> <small>칸 ${Math.round(Math.min(.9,r.z*1.6)*100)}% · 행운 +${Math.round(r.luck*100)}%</small></span>${own?'<span class="pill g">보유</span>':lock?`<span class="pill">${ERAS[r.era].n} 필요</span>`:next?costHTML(c)+`<button class="btn" data-rod="${i}" ${canPay(c)?"":"disabled"}>제작</button>`:'<span class="pill">이전 단계 필요</span>'}</div>`}).join("");
   const baits=Object.keys(BAITS).filter(k=>BAITS[k].c).map(k=>{const c=baitCost(k);return `<div class="card row between"><span>${BAITS[k].ic} <b>${BAITS[k].n} ×5</b> <small>${BAITS[k].d}</small></span>${costHTML(c)}<button class="btn" data-bk="${k}" ${canPay(c)?"":"disabled"}>제작</button></div>`}).join("");
   modal(`<h1>🛒 강태공의 낚시 공방</h1><h3>낚싯대</h3>${rods}<h3>미끼 (보유: ${Object.keys(BAITS).map(k=>BAITS[k].ic+(e.bait[k]||0)).join(" ")})</h3>${baits}<div class="row"><button class="btn" id="mOk">닫기</button></div>`);
   $("mOk").onclick=closeModal;$("modalBox").querySelectorAll("[data-rod]").forEach(b=>b.onclick=()=>{const i=+b.dataset.rod,c=rodCost(i);if(!canPay(c))return;pay(c);e.rod=i;SFX.build();toast(`${RODS[i].n} 제작 완료!`);fishShop();fishHud();save()});
