@@ -2488,5 +2488,42 @@ S=load()||newState();resize();refresh();if(!S.started)intro();else offline();
 requestAnimationFrame(t=>{lastF=t;requestAnimationFrame(tick)});
 
 </script>
+
+<!-- ===== 학습 시간 게이트 (TAD 수학 만지기 연동) ===== -->
+<style>
+#stChip{position:fixed;right:10px;top:max(8px,env(safe-area-inset-top,0px));z-index:9000;background:rgba(10,20,40,.85);color:#fff;border:1px solid #ffd23f;border-radius:999px;padding:6px 12px;font:600 14px/1 'Jua',sans-serif;cursor:pointer;display:flex;gap:6px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+#stChip.low{border-color:#ff6a6a;animation:stBlink 1s infinite}@keyframes stBlink{50%{opacity:.5}}
+#stGate{position:fixed;inset:0;z-index:9500;background:rgba(5,10,25,.94);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Jua',sans-serif;padding:20px}
+#stGate .box{max-width:460px;width:100%;background:#13203a;border:2px solid #ffd23f;border-radius:18px;padding:24px 20px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+#stGate h1{margin:0 0 8px;font-size:26px;color:#ffd23f}#stGate p{margin:8px 0;color:#d8e2ff;font-size:15px;line-height:1.5}
+#stGate a.btn,#stGate button.btn{display:inline-block;margin:6px 4px;padding:12px 18px;border-radius:12px;background:#ffd23f;color:#1a1400;font:700 16px 'Jua',sans-serif;border:0;text-decoration:none;cursor:pointer}
+#stGate button.ghost{background:transparent;color:#ffd23f;border:1px solid #ffd23f}
+#stGate input{width:100%;box-sizing:border-box;padding:10px;border-radius:10px;border:1px solid #4a5a80;background:#0b1326;color:#fff;font-size:13px;margin-top:8px}
+#stGate small{color:#8fa0c8}
+</style>
+<script>
+(function(){
+  const KEY="op:study", SECRET="TAD2026-onepyeong", TAD="https://cncnature.github.io/tad-math/#/tokens", FREE_SEC=600, PIN="2026";
+  const fnv=str=>{ let h=0x811c9dc5; for(const ch of str){ h^=ch.charCodeAt(0); h=Math.imul(h,0x01000193)>>>0; } return h.toString(36); };
+  const today=()=>{ const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
+  const load=()=>{ try{ return JSON.parse(localStorage.getItem(KEY))||{sec:0,used:[],free:"",total:0}; }catch(e){ return {sec:0,used:[],free:"",total:0}; } };
+  const st=load(); const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){} };
+  if(st.free!==today()){ st.free=today(); st.sec+=FREE_SEC; save(); }
+  function redeem(code){ try{ const j=JSON.parse(atob(code.replace(/-/g,"+").replace(/_/g,"/"))); if(!j||!j.m||!j.n||!j.s) return "코드 형식이 올바르지 않습니다"; if(st.used.includes(j.n)) return "이미 사용한 코드입니다"; if(fnv(`${j.m}|${j.t}|${j.n}|${SECRET}`)!==j.s) return "코드 검증 실패"; if(Date.now()-j.t>7*864e5) return "만료된 코드(7일)"; st.used.push(j.n); st.used=st.used.slice(-200); st.sec+=j.m*60; st.total+=j.m; save(); return null; }catch(e){ return "코드를 읽을 수 없습니다"; } }
+  // URL 코드
+  const m=/[#&?]study=([A-Za-z0-9_\-]+)/.exec(location.hash+location.search); if(m){ const err=redeem(m[1]); history.replaceState(null,"",location.pathname); setTimeout(()=>{ if(typeof toast==="function") toast(err?"⏱ "+err:`⏱ 학습 시간 +${JSON.parse(atob(m[1].replace(/-/g,"+").replace(/_/g,"/"))).m}분 충전!`); },800); }
+  const chip=document.createElement("button"); chip.id="stChip"; document.body.appendChild(chip);
+  const fmtT=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+  const drawChip=()=>{ chip.textContent=`⏱ ${fmtT(Math.max(0,st.sec))}`; chip.classList.toggle("low",st.sec<120); };
+  let gate=null;
+  function showGate(msg){ if(gate) return; gate=document.createElement("div"); gate.id="stGate"; gate.innerHTML=`<div class="box"><h1>⏱ ${msg||"학습 시간이 다 되었어요"}</h1><p>일평제국은 <b>공부해서 번 시간</b>만큼 플레이할 수 있어요.<br>TAD 수학 만지기에서 퀴즈·유도 공방·주간 테스트로 시간을 모아 오세요. (매일 무료 10분)</p><a class="btn" href="${TAD}" target="_blank" rel="noopener">📘 공부하러 가기</a><input id="stCode" placeholder="전송 코드 붙여넣기 (TAD → 게임 시간 지갑 → 보내기)"><div><button class="btn" id="stOk">코드 충전</button><button class="btn ghost" id="stPin">보호자 충전(PIN)</button></div><p id="stMsg"><small>남은 시간 ${fmtT(Math.max(0,st.sec))} · 지금까지 충전 ${st.total}분</small></p></div>`; document.body.appendChild(gate);
+    gate.querySelector("#stOk").onclick=()=>{ const c=gate.querySelector("#stCode").value.trim(); const err=redeem(c); gate.querySelector("#stMsg").innerHTML=err?`<small style="color:#ff9a9a">${err}</small>`:`<small style="color:#9fffb0">충전 완료! 남은 시간 ${fmtT(st.sec)}</small>`; if(!err&&st.sec>0) setTimeout(hideGate,700); };
+    gate.querySelector("#stPin").onclick=()=>{ const v=prompt("보호자 PIN 을 입력하면 30분이 충전됩니다."); if(v===PIN){ st.sec+=1800; st.total+=30; save(); hideGate(); } else if(v!==null) alert("PIN 이 틀렸습니다."); }; }
+  function hideGate(){ if(gate){ gate.remove(); gate=null; } drawChip(); }
+  chip.onclick=()=>{ if(gate) return; showGate("학습 시간 충전"); const b=gate.querySelector(".box"); const x=document.createElement("button"); x.className="btn ghost"; x.textContent="닫기"; x.onclick=hideGate; b.appendChild(x); };
+  setInterval(()=>{ if(document.hidden||gate) return; if(st.sec>0){ st.sec--; if(st.sec%10===0) save(); drawChip(); if(st.sec===0){ save(); showGate(); } } else showGate(); },1000);
+  drawChip(); if(st.sec<=0) showGate();
+})();
+</script>
 </body>
 </html>
