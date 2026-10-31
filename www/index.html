@@ -2212,7 +2212,7 @@ Object.assign(STORY,{
  clear7:{t:"녹슨 공장 정복 · 조각 8/9",l:[["mir","거신이 멈추고 공장들이 사람을 위해 다시 돌아간다!"],["moon","좋다… 탑으로 와라. 거기서 끝을 내주마."]]},
  clear8:{t:"종장 · 새 왕의 탄생",l:[["moon","말도 안 돼… 1평짜리 총독 따위가…"],["void","왜… 왜 잊지 않는 것이냐…"],["me","기억은 짐이 아니라 뿌리다. 우리가 일군 1평 1평이 그 증거다."],
   ["arin","아홉 조각이 모였어요! 왕관이… 총독님을 선택했어요."],["mir","새 왕의 탄생이다! 너의 영지는 현실과 맞닿은 '미러 왕국'이 되었다. 진짜 제국은 지금부터다."]]},
- fish0:{t:"이벤트 · 강태공의 낚시터",l:[["tg","허허, 젊은 총독이구먼. 낚싯대는 잡아 봤나?"],["tg","길게 눌렀다 놓으면 찌가 날아가지. 멀리 던질수록 큰 놈이 산다네."],["tg","찌가 쑥 들어가면 바로 눌러 챔질! 그다음엔 눌렀다 뗐다 하며 초록 칸 안에 물고기를 가둬. 게이지가 차면 끌어올린다네."],
+ fish0:{t:"이벤트 · 강태공의 낚시터",l:[["tg","허허, 젊은 총독이구먼. 낚싯대는 잡아 봤나?"],["tg","길게 눌렀다 놓으면 찌가 날아가지. 멀리 던질수록 큰 놈이 산다네."],["tg","찌가 쑥 들어가면 바로 눌러 챔질! 그다음은 힘겨루기야. 물고기가 당길 땐 손을 떼서 장력을 낮추고, 힘이 빠지면 꾹 눌러 줄을 감게. 장력이 빨간 선을 넘으면 줄이 끊어지네."],
   ["tg","A급 이상 물고기는 일꾼을 불러 모으고, S급 이상 전설의 물고기는 영웅을 데려온다지. 좋은 낚싯대와 미끼를 챙기게."]]},
  hunt0:{t:"이벤트 · 야수 사냥",l:[["hunt","총독님, 반란군이 풀어놓은 거대 야수가 영지 밖을 배회합니다!"],["hunt","녀석은 쓰러뜨릴 수 없어요. 60초 동안 최대한 많은 피해를 주는 게 목표입니다."],
   ["hunt","피해 단계가 오를수록 전리품이 쌓이고, 10단계를 넘기면 '야수 전리품'(전 군 공격력 영구 +3%)을 얻어요. 앞발 공격은 좌우로 피하세요!"]]},
@@ -2297,7 +2297,7 @@ function fUp(){const z=FZ;if(!z)return;if(z.st==="idle"&&z.charge){z.charge=fals
 function castLine(){const z=FZ,e=EV();e.bait[e.bsel]--;z.dist=Math.max(.08,z.pow);z.st="fly";z.fly=0;z.from={...z.tip};z.to=bobPos(z.dist);snd(520,.22,"sine",.05,180);fishHud()}
 const zw0=R=>Math.min(.9,R.z*1.6);
 function startReel(){const z=FZ,e=EV(),c=rollFish(z.dist),g=c.f.g;z.st="reel";z.hold=false;
-  z.reel={c,fy:.5,ft:.5,fv:0,zy:.5,zv:0,prog:.45,nt:0,spd:.2+g*.11,erratic:.06+g*.06,jt:0};fMsg("챔질 성공! 초록 칸 안에 물고기를 가두세요","#d8ffb0");snd(880,.08,"square",.05);SFX.gate()}
+  z.reel={c,ten:.3,sta:1,run:false,nt:.6+Math.random()*.8,prog:.2,jt:0,str:.6+g*.18,runT:0};fMsg("챔질 성공! 당길 때 손 떼고, 힘 빠지면 줄 감기","#d8ffb0");snd(880,.08,"square",.05);SFX.gate()}
 function rollFish(dist){const e=EV(),R=RODS[e.rod],luck=R.luck+BAITS[e.bsel].luck+dist*.3;const w=[52,26,13,6,2.2,.7].map((x,g)=>x*Math.pow(1+luck,g*.95));
   let r=Math.random()*w.reduce((a,b)=>a+b),g=0;for(;g<5;g++){r-=w[g];if(r<0)break}
   const pool=gg=>FISH.filter(f=>f.g===gg&&f.sp.includes(e.spot)&&(!f.junk||Math.random()<.5));let p=pool(g);while(g>0&&!p.length){g--;p=pool(g)}if(!p.length)p=FISH.filter(f=>f.g===0&&f.sp.includes(e.spot));
@@ -2312,12 +2312,20 @@ function fishUpdate(dt){const z=FZ,e=EV(),R=RODS[e.rod];z.msgT-=dt;z.dip=Math.ma
   else if(z.st==="wait"){z.waitT-=dt;z.nib-=dt;if(z.nib<=0){z.nib=.5+Math.random()*1.2;z.dip=.35;z.rip.push({x:z.bob.x,y:z.bob.y,r:4,life:.8})}
     if(z.waitT<=0){z.st="bite";z.biteT=R.win*1.6;z.dip=1;splash(z.bob.x,z.bob.y,16);snd(980,.12,"square",.06);fMsg("! 지금 누르세요 !","#ffe36a")}}
   else if(z.st==="bite"){z.biteT-=dt;z.dip=1;if(z.biteT<=0){z.st="idle";z.bob=null;fMsg("놓쳤다… 물고기가 미끼만 따먹고 갔다","#ffb0a0");SFX.bad()}}
-  else if(z.st==="reel"){const r=z.reel,g=r.c.f.g;r.nt-=dt;if(r.nt<=0){r.nt=(.7+Math.random()*1.4)/(1+g*.15);r.ft=Math.random()<r.erratic?(Math.random()<.5?.05:.95):.1+Math.random()*.8}
-    r.fv+=((r.ft-r.fy)*r.spd*9-r.fv*3)*dt;r.fy=Math.max(0,Math.min(1,r.fy+r.fv*dt));
-    r.zv+=(z.hold?1.6:-1.3)*dt;r.zv*=Math.pow(.25,dt);r.zy+=r.zv*dt;if(r.zy<zw0(R)/2){r.zy=zw0(R)/2;r.zv=Math.abs(r.zv)*.3}if(r.zy>1-zw0(R)/2){r.zy=1-zw0(R)/2;r.zv=-Math.abs(r.zv)*.3}
-    const zw=Math.min(.9,R.z*1.6);const inside=Math.abs(r.fy-r.zy)<zw/2;r.in=inside;r.prog+=inside?R.pw*1.6*dt*(1-g*.04):-.1*dt*(1+g*.08);r.jt-=dt;
-    if(r.jt<=0){r.jt=.12;if(inside)snd(500+r.prog*500,.03,"triangle",.02);z.bob.x+=(Math.random()-.5)*14;z.bob.x=Math.max(FZ.W*.3,Math.min(FZ.W*.85,z.bob.x));splash(z.bob.x,z.bob.y,inside?2:4)}
-    if(r.prog>=1){z.st="show";fishCaught(r.c)}else if(r.prog<=0){z.st="idle";z.bob=null;fMsg("줄이 풀렸다! 물고기가 도망갔다","#ffb0a0");SFX.lose()}}}
+  else if(z.st==="reel"){const r=z.reel,g=r.c.f.g;const tol=1+(R.z-.24)*2.5; // 낚싯대가 좋을수록 장력 여유
+    r.nt-=dt;if(r.nt<=0){if(r.run){r.run=false;r.nt=1.0+Math.random()*1.6;snd(240,.1,"sine",.03)}else{r.run=true;r.runT=0;r.nt=(.7+Math.random()*1.3)*(.35+r.sta*.9);snd(700,.12,"square",.04);SFX.gate&&SFX.gate()}}
+    if(r.run)r.runT+=dt;
+    // 장력: 물고기가 당기는 중에 줄을 감으면 급상승, 손을 떼면 완만히 하강. 쉴 때 감으면 약간 상승, 쉴 때 손 떼면 빠르게 하강
+    const dten=r.run?(z.hold?.75*r.str:-.12):(z.hold?.16*r.str:-.4);r.ten=Math.max(0,Math.min(1.2,r.ten+dten*dt/tol));
+    // 끌어올리기: 쉴 때 감으면 진행, 당길 때 감아도 조금 진행(위험), 당길 때 손 떼면 줄이 풀림
+    const dprog=r.run?(z.hold?.06*R.pw:-.045*(1+g*.1)):(z.hold?.5*R.pw*(1+(1-r.sta)*.8):0);r.prog=Math.max(0,r.prog+dprog*dt);
+    // 체력: 당기는 동안 손을 떼면(장력 적정) 가장 빨리 빠지고, 감으면 조금 빠짐
+    r.sta=Math.max(0,r.sta-(r.run?(z.hold?.05:.11):.015)*dt/(1+g*.12));
+    r.in=r.run?!z.hold:z.hold; r.jt-=dt;
+    if(r.jt<=0){r.jt=.12;if(r.in)snd(500+r.prog*500,.03,"triangle",.02);z.bob.x+=(Math.random()-.5)*(r.run?22:8);z.bob.x=Math.max(FZ.W*.3,Math.min(FZ.W*.85,z.bob.x));splash(z.bob.x,z.bob.y,r.run?5:2)}
+    if(r.ten>=1){z.st="idle";z.bob=null;fMsg("줄이 끊어졌다! 당길 땐 손을 떼세요","#ffb0a0");SFX.lose()}
+    else if(r.prog>=1){z.st="show";fishCaught(r.c)}
+    else if(r.prog<=0&&r.runT>1.2){z.st="idle";z.bob=null;fMsg("줄이 다 풀렸다! 물고기가 도망갔다","#ffb0a0");SFX.lose()}}}
 function splash(x,y,n){for(let i=0;i<n;i++)FZ.p.push({x,y,vx:(Math.random()-.5)*160,vy:-120-Math.random()*200,life:.5+Math.random()*.4,r:2+Math.random()*3});FZ.rip.push({x,y,r:6,life:1})}
 function fishDraw(){const z=FZ,c=z.c,W=z.W,t=z.t,e=EV(),sp=SPOTS[e.spot],HZ6=210;c.setTransform(z.k,0,0,z.k,0,0);
   let g=c.createLinearGradient(0,0,0,HZ6);g.addColorStop(0,sp.sky[0]);g.addColorStop(1,sp.sky[1]);c.fillStyle=g;c.fillRect(0,0,W,HZ6+2);
@@ -2344,7 +2352,7 @@ function fishDraw(){const z=FZ,c=z.c,W=z.W,t=z.t,e=EV(),sp=SPOTS[e.spot],HZ6=210
   c.fillStyle="#ffd8b0";c.beginPath();c.arc(fx,fy-78,15,0,7);c.fill();c.stroke();c.fillStyle="#e8c060";c.beginPath();c.ellipse(fx,fy-88,26,7,0,0,7);c.fill();c.stroke();c.beginPath();c.arc(fx,fy-90,12,Math.PI,0);c.fill();c.stroke();
   c.fillStyle=INK;c.fillRect(fx+4,fy-80,3,3);
   // 낚싯대
-  const bend=z.st==="reel"?(z.reel.in?.5:.25)+Math.sin(t*20)*.05:z.st==="bite"?.4:0,hx=fx+14,hy=fy-48,ang=-.95+(z.charge?-.5*z.pow:0)+bend*.6,L=150;
+  const bend=z.st==="reel"?(z.reel.run?.55:.25)+Math.sin(t*20)*.05:z.st==="bite"?.4:0,hx=fx+14,hy=fy-48,ang=-.95+(z.charge?-.5*z.pow:0)+bend*.6,L=150;
   const tx=hx+Math.cos(ang)*L,ty=hy+Math.sin(ang)*L+bend*60;z.tip={x:tx,y:ty};c.strokeStyle="#5a3418";c.lineWidth=6;c.lineCap="round";c.beginPath();c.moveTo(hx,hy);c.quadraticCurveTo(hx+Math.cos(ang)*L*.6,hy+Math.sin(ang)*L*.6,tx,ty);c.stroke();
   c.strokeStyle="#c89a5a";c.lineWidth=3;c.stroke();c.lineCap="butt";c.fillStyle="#888";c.beginPath();c.arc(hx+6,hy+4,6,0,7);c.fill();
   if(z.bob){const b=z.bob,tense=z.st==="reel"||z.st==="bite";c.strokeStyle="rgba(255,255,255,.85)";c.lineWidth=1.3;c.beginPath();c.moveTo(tx,ty);c.quadraticCurveTo((tx+b.x)/2,Math.max(ty,b.y)+(tense?0:60),b.x,b.y);c.stroke();
@@ -2356,14 +2364,22 @@ function fishDraw(){const z=FZ,c=z.c,W=z.W,t=z.t,e=EV(),sp=SPOTS[e.spot],HZ6=210
     const pb=bobPos(Math.max(.08,z.pow));c.strokeStyle="rgba(255,255,255,.7)";c.setLineDash([6,5]);c.lineWidth=2;c.beginPath();c.ellipse(pb.x,pb.y,26*pb.s,8*pb.s,0,0,7);c.stroke();c.setLineDash([])}
   if(z.st==="reel")drawReel(c,W,t);
   if(z.msgT>0){c.globalAlpha=Math.min(1,z.msgT*2);olText2(c,z.msg,W/2,150,24,z.msgCol);c.globalAlpha=1}
-  const hint=z.st==="idle"?(z.charge?"놓으면 던집니다!":"길게 눌렀다 놓아 던지기 (스페이스)"):z.st==="wait"?"찌를 지켜보세요…":z.st==="reel"?"누르면 올라가고 떼면 내려갑니다":"";const h=$("fHint");if(h)h.style.opacity=z.msgT>0?0:1;if(h&&h.textContent!==hint)h.textContent=hint}
+  const hint=z.st==="idle"?(z.charge?"놓으면 던집니다!":"길게 눌렀다 놓아 던지기 (스페이스)"):z.st==="wait"?"찌를 지켜보세요…":z.st==="reel"?"물고기가 당기면(빨간 문구) 손 떼기 · 힘 빠지면(초록 문구) 눌러서 줄 감기":"";const h=$("fHint");if(h)h.style.opacity=z.msgT>0?0:1;if(h&&h.textContent!==hint)h.textContent=hint}
 function drawReel(c,W,t){const z=FZ,r=z.reel,R=RODS[EV().rod],x=W-230,y=80,h=360,w=56;
   c.fillStyle="rgba(10,20,40,.78)";rr(c,x-14,y-14,w+70,h+28,16);c.fill();c.strokeStyle="rgba(255,255,255,.35)";c.lineWidth=2;c.stroke();
-  let g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,"#3a9ad8");g.addColorStop(1,"#0a3a6a");c.fillStyle=g;rr(c,x,y,w,h,10);c.fill();
-  const zh=zw0(R)*h,zy=y+h-(r.zy*h)-zh/2;c.fillStyle=r.in?"rgba(120,255,140,.55)":"rgba(120,255,140,.3)";rr(c,x+3,zy,w-6,zh,8);c.fill();c.strokeStyle=r.in?"#d8ffb0":"#7dff9a";c.lineWidth=3;c.stroke();
-  const fy=y+h-r.fy*h,f=r.c.f;c.save();c.translate(x+w/2,fy);c.rotate(Math.sin(t*12)*.25);c.font="34px "+EMOJI;c.textAlign="center";c.textBaseline="middle";if(f.h)c.filter=`hue-rotate(${f.h}deg)`;c.fillText(f.junk?"❔":f.ic,0,0);c.restore();c.filter="none";
-  const px=x+w+14;c.fillStyle="#0e1822";rr(c,px,y,18,h,8);c.fill();const ph=Math.max(0,Math.min(1,r.prog))*h;g=c.createLinearGradient(0,y+h,0,y);g.addColorStop(0,"#ff8a3a");g.addColorStop(.5,"#ffe36a");g.addColorStop(1,"#7dff9a");c.fillStyle=g;rr(c,px,y+h-ph,18,ph,8);c.fill();
-  olText2(c,"???",x+w/2+12,y-28,18,"#fff")}
+  // 장력 게이지 (아래→위): 초록(여유) → 노랑 → 빨강(끊김)
+  let g=c.createLinearGradient(0,y+h,0,y);g.addColorStop(0,"#7dff9a");g.addColorStop(.55,"#ffe36a");g.addColorStop(.85,"#ff8a3a");g.addColorStop(1,"#ff3a3a");c.fillStyle="#0e1822";rr(c,x,y,w,h,10);c.fill();
+  const th=Math.max(0,Math.min(1,r.ten))*h;c.fillStyle=g;rr(c,x+3,y+h-th,w-6,th,8);c.fill();
+  c.strokeStyle="rgba(255,80,80,.9)";c.setLineDash([6,4]);c.lineWidth=2;c.beginPath();c.moveTo(x,y+h*.15);c.lineTo(x+w,y+h*.15);c.stroke();c.setLineDash([]);
+  olText2(c,"장력",x+w/2,y-28,16,"#fff");
+  // 물고기 아이콘: 당길 때 크게 흔들림
+  const f=r.c.f;c.save();c.translate(x+w/2,y+h*.5);c.rotate(Math.sin(t*(r.run?26:8))*(r.run?.45:.15));c.font="34px "+EMOJI;c.textAlign="center";c.textBaseline="middle";if(f.h)c.filter=`hue-rotate(${f.h}deg)`;c.fillText(f.junk?"❔":f.ic,0,0);c.restore();c.filter="none";
+  // 진행(끌어올리기) 바 + 체력
+  const px=x+w+14;c.fillStyle="#0e1822";rr(c,px,y,18,h,8);c.fill();const ph=Math.max(0,Math.min(1,r.prog))*h;g=c.createLinearGradient(0,y+h,0,y);g.addColorStop(0,"#3a9ad8");g.addColorStop(1,"#7dff9a");c.fillStyle=g;rr(c,px,y+h-ph,18,ph,8);c.fill();
+  c.fillStyle="rgba(255,255,255,.25)";rr(c,px+24,y,8,h,4);c.fill();c.fillStyle="#ff9ad8";rr(c,px+24,y+h-r.sta*h,8,r.sta*h,4);c.fill();
+  // 상태 문구
+  const msg=r.run?"💪 당긴다! 손 떼기":"😮‍💨 힘 빠짐! 줄 감기",col=r.run?"#ffb0a0":"#d8ffb0";c.fillStyle="rgba(10,20,40,.8)";rr(c,x-262,y+h*.42,236,40,12);c.fill();olText2(c,msg,x-144,y+h*.42+20,20,col);
+  if(r.ten>.8){c.globalAlpha=.5+Math.sin(t*30)*.5;olText2(c,"⚠ 끊어진다!",x+w/2-10,y+h*.08,18,"#ff6a6a");c.globalAlpha=1}}
 function olText2(c,t,x,y,size,col){c.font=`400 ${size}px 'Jua','Black Han Sans',sans-serif`;c.textAlign="center";c.textBaseline="middle";c.lineJoin="round";c.strokeStyle=INK;c.lineWidth=Math.max(3,size/5);c.strokeText(t,x,y);c.fillStyle=col;c.fillText(t,x,y)}
 function fishCaught(c){const e=EV(),f=c.f,g=f.g,m=1+S.era,out=[],rw={};S.stats.fish++;
   if(f.id==="boot"){rw.coin=Math.round(15*m)}
@@ -2380,7 +2396,7 @@ function fishCaught(c){const e=EV(),f=c.f,g=f.g,m=1+S.era,out=[],rw={};S.stats.f
    <div class="fi" style="${f.h?`filter:hue-rotate(${f.h}deg) drop-shadow(0 6px 0 rgba(0,0,0,.3))`:""}">${f.ic}</div><h2 class="ol">${f.n}</h2><div class="wt">${f.junk?"":c.wt>=1000?(c.wt/1000).toFixed(2)+" 톤":c.wt.toFixed(2)+" kg"}</div>
    <div class="rw">${rewardHTML(rw)}${out.map(x=>`<div class="pill y">${x}</div>`).join("")}<div class="pill">🏆 대회 +${pts}점</div></div><button class="btn big2" id="fGo">계속 낚시</button></div>`;
   $("fGo").onclick=()=>{R.hidden=true;FZ.st="idle";FZ.bob=null;fishHud();save()};save();fishHud()}
-function fishShop(){const e=EV();const rods=RODS.map((r,i)=>{const own=e.rod>=i,next=i===e.rod+1,lock=S.era<r.era,c=rodCost(i);return `<div class="card row between"><span>${r.ic} <b>${r.n}</b> <small>칸 ${Math.round(Math.min(.9,r.z*1.6)*100)}% · 행운 +${Math.round(r.luck*100)}%</small></span>${own?'<span class="pill g">보유</span>':lock?`<span class="pill">${ERAS[r.era].n} 필요</span>`:next?costHTML(c)+`<button class="btn" data-rod="${i}" ${canPay(c)?"":"disabled"}>제작</button>`:'<span class="pill">이전 단계 필요</span>'}</div>`}).join("");
+function fishShop(){const e=EV();const rods=RODS.map((r,i)=>{const own=e.rod>=i,next=i===e.rod+1,lock=S.era<r.era,c=rodCost(i);return `<div class="card row between"><span>${r.ic} <b>${r.n}</b> <small>장력 여유 +${Math.round((r.z-.24)*250)}% · 행운 +${Math.round(r.luck*100)}%</small></span>${own?'<span class="pill g">보유</span>':lock?`<span class="pill">${ERAS[r.era].n} 필요</span>`:next?costHTML(c)+`<button class="btn" data-rod="${i}" ${canPay(c)?"":"disabled"}>제작</button>`:'<span class="pill">이전 단계 필요</span>'}</div>`}).join("");
   const baits=Object.keys(BAITS).filter(k=>BAITS[k].c).map(k=>{const c=baitCost(k);return `<div class="card row between"><span>${BAITS[k].ic} <b>${BAITS[k].n} ×5</b> <small>${BAITS[k].d}</small></span>${costHTML(c)}<button class="btn" data-bk="${k}" ${canPay(c)?"":"disabled"}>제작</button></div>`}).join("");
   modal(`<h1>🛒 강태공의 낚시 공방</h1><h3>낚싯대</h3>${rods}<h3>미끼 (보유: ${Object.keys(BAITS).map(k=>BAITS[k].ic+(e.bait[k]||0)).join(" ")})</h3>${baits}<div class="row"><button class="btn" id="mOk">닫기</button></div>`);
   $("mOk").onclick=closeModal;$("modalBox").querySelectorAll("[data-rod]").forEach(b=>b.onclick=()=>{const i=+b.dataset.rod,c=rodCost(i);if(!canPay(c))return;pay(c);e.rod=i;SFX.build();toast(`${RODS[i].n} 제작 완료!`);fishShop();fishHud();save()});
